@@ -1,0 +1,7 @@
+development: &default
+  adapter: postgresql
+  database: dropbox_s3_webhook_development
+
+test: &test
+  <<: *default
+  database: dropbox_s3_webhook_test

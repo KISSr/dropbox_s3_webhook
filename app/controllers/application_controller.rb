@@ -7,7 +7,7 @@ class ApplicationController < ActionController::Base
 
   def authorize
     unless valid_signature?
-      render nothing: true, status: 400
+      render nothing: true, status: 401
     end
   end
 

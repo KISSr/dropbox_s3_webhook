@@ -2,16 +2,18 @@ class DeltaJob
   @queue = :default
 
   def self.perform(dropbox_user_id)
-    @user = User.find_by(dropbox_user_id: dropbox_user_id)
+    @@user = User.find_by(dropbox_user_id: dropbox_user_id)
 
-    delta = dropbox.delta(@user.cursor)
+    if @@user.present?
+      delta = dropbox.delta(@@user.cursor)
 
-    @user.update_attributes(cursor: delta['cursor'])
+      @@user.update_attributes(cursor: delta['cursor'])
 
-    process_delta(delta['entries'])
+      process_delta(delta['entries'])
+    end
   end
 
-  def process_delta(delta)
+  def self.process_delta(delta)
     delta.each do |file_name, metadata|
       if metadata['is_dir']
         next
@@ -27,23 +29,23 @@ class DeltaJob
     end
   end
 
-  def bucket
+  def self.bucket
     aws.directories.new(key: ENV['KISSR_BUCKET'])
   end
 
-  def aws
-    @aws ||= Fog::Storage.new(
+  def self.aws
+    @@aws ||= Fog::Storage.new(
       provider: 'AWS',
       aws_access_key_id: ENV['AWS_ACCESS_KEY_ID'],
       aws_secret_access_key: ENV['AWS_SECRET_ACCESS_KEY']
     )
   end
 
-  def dropbox
-    @dropbox ||= DropboxClient.new(token)
+  def self.dropbox
+    @@dropbox ||= DropboxClient.new(token)
   end
 
-  def token
-    @user.token
+  def self.token
+    @@user.token
   end
 end

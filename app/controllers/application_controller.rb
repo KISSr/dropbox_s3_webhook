@@ -6,6 +6,7 @@ class ApplicationController < ActionController::Base
   before_filter :authorize
 
   def authorize
+    binding.pry
     unless valid_signature?
       render nothing: true, status: 401
     end
@@ -20,6 +21,6 @@ class ApplicationController < ActionController::Base
   end
 
   def sign(data)
-    OpenSSL::HMAC.hexdigest(OpenSSL::Digest::Digest.new('sha1'), ENV['DROPBOX_SECRET'], data)
+    OpenSSL::HMAC.hexdigest(OpenSSL::Digest::Digest.new('sha256'), ENV['DROPBOX_SECRET'], data)
   end
 end

@@ -1,5 +1,7 @@
 class DeltaJob
-  def work(dropbox_user_id)
+  @queue = :default
+
+  def self.perform(dropbox_user_id)
     @user = User.find_by(dropbox_user_id: dropbox_user_id)
 
     delta = dropbox.delta(@user.cursor)

@@ -2,25 +2,40 @@ require 'spec_helper'
 
 describe '/deltas' do
   it 'responds with a 200 response code' do
-    post '/', delta_json
+    allow(Resque).to receive(:enqueue)
+    post_json_with_signature(delta.to_json)
 
     expect(response.code).to eq '200'
   end
 
   it 'syncs to s3' do
-    allow_any_instance_of(Fog::Storage::AWS::Files)
-      .to receive(:create)
+    Resque.stub(:enqueue)
 
-    post '/', delta_json
+    post_json_with_signature(delta.to_json)
 
-    expect(Fog::Storage::AWS::Files)
-      .to receive(:create)
-      .with(
-        body: 'test'
-      )
+    expect(Resque).to have_received(:enqueue)
   end
+
+  it 'responds with a 400 response code if the signature is wrong' do
+    post '/', delta.to_json, {'X-Dropbox-Signature' => 'wrong_signature'}
+
+    expect(response.code).to eq '401'
+  end
+
 end
 
-def delta_json
-  { delta: { users: [1, 2]} }.to_json
+def post_json_with_signature(post_data)
+  post '/', post_data,
+    {
+      'X-Dropbox-Signature' => sign(post_data),
+      'CONTENT_TYPE' => 'application/json'
+    }
+end
+
+def sign(data)
+  OpenSSL::HMAC.hexdigest(OpenSSL::Digest::Digest.new('sha256'), ENV['DROPBOX_SECRET'], data)
+end
+
+def delta
+  { delta: { users: [create(:user).dropbox_user_id]} }
 end

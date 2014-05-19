@@ -6,8 +6,8 @@ class DeltasController < ApplicationController
   end
 
   def queue_delta_jobs
-    params['delta']['users'].each do |user_id|
-      Resque.enqueue(DeltaJob, user_id)
+    params[:delta][:users].each do |user_id|
+      Resque.enqueue(DeltaJob, user_id.to_s)
     end
   end
 end

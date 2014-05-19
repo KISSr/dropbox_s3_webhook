@@ -10,11 +10,7 @@ class ApplicationController < ActionController::Base
   end
 
   def valid_signature?
-    if params[:challenge].present?
-      request.headers['X-Dropbox-Signature'] == sign('dbx')
-    else
-      request.headers['X-Dropbox-Signature'] == sign(request.body.read)
-    end
+    request.headers['X-Dropbox-Signature'] == sign(request.body.read)
   end
 
   def sign(data)

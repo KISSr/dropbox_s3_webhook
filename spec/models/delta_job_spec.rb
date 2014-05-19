@@ -36,10 +36,8 @@ describe DeltaJob, '#work' do
       .and_return('test')
 
     user = create(:user)
-    job = DeltaJob.new
 
-    job.work(user.dropbox_user_id)
-
+    Resque.enqueue(DeltaJob, user.dropbox_user_id)
   end
 end
 

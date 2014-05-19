@@ -21,12 +21,12 @@ class DeltaJob
   def self.process_delta(delta)
     delta.each do |file_name, metadata|
       if metadata.nil?
-        bucket.files.new(key: file_name[1..-1]).destroy
+        bucket.files.new(key: file_name).destroy
       elsif metadata['is_dir'].present?
         next
       else
         bucket.files.create(
-          key: file_name[1..-1],
+          key: file_name,
           body: dropbox.get_file(file_name),
           public: true
         )

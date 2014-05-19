@@ -1,6 +1,9 @@
 class UsersController < ApplicationController
   def create
-    User.create(dropbox_user_id: params[:id])
+    User.create(
+      dropbox_user_id: params[:id],
+      token: params[:user][:token]
+    )
 
     head 200
   end

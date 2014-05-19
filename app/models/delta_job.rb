@@ -20,6 +20,8 @@ class DeltaJob
 
   def self.process_entries(entries)
     entries.each do |file_name, metadata|
+      file_name.sub!('/','')
+
       if included_in_users_directories?(file_name)
         process_file(file_name, metadata)
       end
@@ -33,7 +35,7 @@ class DeltaJob
   def self.process_file(file_name, metadata)
     if metadata.nil?
       bucket.files.new(key: file_name).destroy
-    elsif metadata['is_dir'].nil?
+    elsif !metadata['is_dir']
       bucket.files.create(
         key: file_name,
         body: dropbox.get_file(file_name),

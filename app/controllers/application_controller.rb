@@ -1,9 +1,7 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery with: :null_session
 
-  before_filter :authorize
-
-  def authorize
+  def authorize_dropbox
     unless valid_signature?
       render nothing: true, status: 401
     end

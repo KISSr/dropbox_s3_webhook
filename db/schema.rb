@@ -18,6 +18,7 @@ ActiveRecord::Schema.define(version: 20140322211237) do
 
   create_table "users", force: true do |t|
     t.string   "dropbox_user_id"
+    t.string   "directories",     default: [], array: true
     t.string   "cursor"
     t.string   "token"
     t.datetime "created_at"

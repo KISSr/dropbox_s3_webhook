@@ -10,7 +10,7 @@ describe DeltaJob, '#work' do
     Fog::Storage::AWS::Files.any_instance
       .should_receive(:create)
       .with(
-        key: 'test.txt',
+        key: 'test/test.txt',
         body: 'test',
         public: true
       )
@@ -22,9 +22,9 @@ describe DeltaJob, '#work' do
           cursor: '123',
           entries: [
             [
-              'test.txt',
+              'test/test.txt',
               {
-                file_name: 'test.txt'
+                file_name: 'test/test.txt'
               }
             ]
           ]
@@ -35,7 +35,7 @@ describe DeltaJob, '#work' do
       .to receive(:get_file)
       .and_return('test')
 
-    user = create(:user)
+    user = create(:user, directories: ['test'])
 
     Resque.enqueue(DeltaJob, user.dropbox_user_id)
   end

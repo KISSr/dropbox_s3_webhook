@@ -9,7 +9,7 @@ class DeltaJob
       begin
         delta = dropbox.delta(@@user.cursor)
 
-        process_delta(delta['entries'])
+        process_entries(delta['entries'])
 
         @@user.cursor = delta['cursor']
       end while delta['has_more']
@@ -18,19 +18,27 @@ class DeltaJob
     end
   end
 
-  def self.process_delta(delta)
-    delta.each do |file_name, metadata|
-      if metadata.nil?
-        bucket.files.new(key: file_name).destroy
-      elsif metadata['is_dir'].present?
-        next
-      else
-        bucket.files.create(
-          key: file_name,
-          body: dropbox.get_file(file_name),
-          public: true
-        )
+  def self.process_entries(entries)
+    entries.each do |file_name, metadata|
+      if included_in_users_directories?(file_name)
+        process_file(file_name, metadata)
       end
+    end
+  end
+
+  def self.included_in_users_directories?(file_name)
+    @@user.directories.any?{|directory| file_name.starts_with?(directory)}
+  end
+
+  def self.process_file(file_name, metadata)
+    if metadata.nil?
+      bucket.files.new(key: file_name).destroy
+    elsif metadata['is_dir'].nil?
+      bucket.files.create(
+        key: file_name,
+        body: dropbox.get_file(file_name),
+        public: true
+      )
     end
   end
 

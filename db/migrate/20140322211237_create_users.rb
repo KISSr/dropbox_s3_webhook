@@ -2,6 +2,7 @@ class CreateUsers < ActiveRecord::Migration
   def change
     create_table :users do |t|
       t.string :dropbox_user_id
+      t.string :directories, array: true, default: '{}'
       t.string :cursor
       t.string :token
 

@@ -1,4 +1,6 @@
 class DeltasController < ApplicationController
+  before_filter :authorize_dropbox
+
   def create
     queue_delta_jobs
 

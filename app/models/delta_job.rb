@@ -5,9 +5,10 @@ class DeltaJob
     @@user = User.find_by(dropbox_user_id: dropbox_user_id)
 
     if @@user.present?
+      @@dropbox = DropboxClient.new(token)
 
       begin
-        delta = dropbox.delta(@@user.cursor)
+        delta = @@dropbox.delta(@@user.cursor)
 
         process_entries(delta['entries'])
 
@@ -54,10 +55,6 @@ class DeltaJob
       aws_access_key_id: ENV['AWS_ACCESS_KEY_ID'],
       aws_secret_access_key: ENV['AWS_SECRET_ACCESS_KEY']
     )
-  end
-
-  def self.dropbox
-    @@dropbox ||= DropboxClient.new(token)
   end
 
   def self.token

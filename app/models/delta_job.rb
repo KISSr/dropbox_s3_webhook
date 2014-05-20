@@ -39,7 +39,7 @@ class DeltaJob
     elsif !metadata['is_dir']
       bucket.files.create(
         key: file_name,
-        body: dropbox.get_file(file_name),
+        body: @@dropbox.get_file(file_name),
         public: true
       )
     end

@@ -1,9 +1,11 @@
 class UsersController < ApplicationController
   def create
-    User.create(
-      dropbox_user_id: params[:id],
-      token: params[:user][:token]
-    )
+    user = User.where(dropbox_user_id: params[:id])
+      .first_or_initialize
+
+    user.token = params[:user][:token]
+
+    user.save
 
     head 200
   end
